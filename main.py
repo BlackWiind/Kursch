@@ -2,8 +2,10 @@ import math
 from array import array
 from math import cos
 
+horde_a = 0
+horde_b = 3
 a = 0
-b = 3
+b = 1
 h = 1
 iterations = 0
 accurcity = 0.0001
@@ -68,31 +70,42 @@ def interpolation(local_x: array, local_y: array, local_xIp: array, local_n: int
     h = local_x[1] - local_x[0]
     for i in range(local_nIp):
         j = 0
-        while j <= local_n or local_x[j] <= local_xIp[i]:
-            # print(i,'\t',j,'\t',n,'\t',x[j],'\t',xIp[i])
+        while j < local_n and local_x[j] <= local_xIp[i]:
+            # print(i,'\t',j,'\t',n,'\t',local_x[j],'\t',local_xIp[i])
             j += 1
         j -= 1
         q = (local_xIp[i] - local_x[j]) / h
-        arr.append(local_y[j] + q * (local_y[j + 1] - local_y[j]))
+        arr.append(round(local_y[j] + q * (local_y[j + 1] - local_y[j]), 4))
     return arr
+
+
+def heat(local_y: array, local_n: int) -> float:
+    h = (b - a) / local_n
+    sum = 0
+    for i in range(1, local_n - 1):
+        sum += local_y[i]
+    return h * ((local_y[0] + local_y[local_n]) / 2 + sum)
 
 
 while True:
     iterations += 1
-    answer = horde(a, b)
-    if math_function(a) * math_function1(a) > 0:
-        b = answer
+    answer = horde(horde_a, horde_b)
+    if math_function(horde_a) * math_function1(horde_a) > 0:
+        horde_b = answer
     else:
-        a = answer
+        horde_a = answer
     if math_function(answer) <= accurcity:
         break
 rC_calc(h)
-nIp = math.trunc((1 - 0) / 0.1)
-xIp = [0 + 0.1 * i for i in range(1, nIp)]
-[print(value) for value in xIp]
+nIp = math.trunc((b - a) / 0.1 + 1)
+xIp = [0 + 0.1 * i for i in range(nIp)]
+
 interpol_arr = interpolation(x1, y1, xIp, n, nIp)
 
-print("\ta = ", a)
-print("\tb = ", b)
+print("\ta = ", horde_a)
+print("\tb = ", horde_b)
 print("\tanswer = ", answer)
 print("\titerations = ", iterations)
+[print(f"x = {round(xIp[i], 1)}\ty = {interpol_arr[i]}") for i in range(len(xIp))]
+interpol_arr = [value ** 2 for value in interpol_arr]
+print(f"Количество теплоты = {heat(interpol_arr, nIp - 1)}")
